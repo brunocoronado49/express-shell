@@ -1,9 +1,10 @@
 import { UserModel } from '../../data';
 import { bcryptAdapter } from '../../config/bcrypt.adapter';
-import { RegisterUserDto } from '../../domain/dtos/auth/register-user.dto';
 import { UserEntity } from '../../domain/entities/user.entity';
 import { CustomError } from '../../domain/errors/custom.error';
 import { LoginUserDto } from '../../domain/dtos/auth/login-user.dto';
+import { RegisterUserDto } from '../../domain/dtos/auth/register-user.dto';
+import { JwtAdapter } from '../../config/jwt.adapter';
 
 export class AuthService {
   constructor() {}
@@ -33,10 +34,19 @@ export class AuthService {
 
   public async loginUser(loginUserDto: LoginUserDto) {
     const user = await UserModel.findOne({ email: loginUserDto.email });
+    if (!user) throw CustomError.notFound('Email user not found');
 
-    if (!user) throw CustomError.notFound('User not found');
+    const passMatch = bcryptAdapter.compare(loginUserDto.password, user.password);
+    if (!passMatch) throw CustomError.unauthorized('Password not valid');
 
-    try {
-    } catch (error) {}
+    const { password, ...userEntity } = UserEntity.fromObject(user);
+
+    const token = await JwtAdapter.generateToken({ id: user.id, email: user.email });
+    if (!token) throw CustomError.internalServer('Error while create JWT');
+
+    return {
+      useer: userEntity,
+      token: token,
+    };
   }
 }

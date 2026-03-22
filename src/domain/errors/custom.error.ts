@@ -10,7 +10,7 @@ export class CustomError extends Error {
     return new CustomError(400, message);
   }
 
-  static unauthorizewd(message: string): CustomError {
+  static unauthorized(message: string): CustomError {
     return new CustomError(401, message);
   }
 
