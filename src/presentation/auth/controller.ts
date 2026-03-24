@@ -7,7 +7,7 @@ import { LoginUserDto } from '../../domain/dtos/auth/login-user.dto';
 export class AuthController {
   constructor(public readonly authService: AuthService) {}
 
-  private handlerError = (error: unknown, res: Response) => {
+  private handlerError = (error: unknown, res: Response): Response<any, Record<string, any>> => {
     if (error instanceof CustomError) {
       return res.status(error.statusCode).json({ error: error.message });
     }
@@ -16,7 +16,7 @@ export class AuthController {
     return res.status(500).json({ error: 'Internal server error' });
   };
 
-  registerUser = async (req: Request, res: Response) => {
+  public registerUser = async (req: Request, res: Response) => {
     const [error, registerUserDto] = RegisterUserDto.create(req.body);
 
     if (error) return res.status(400).json({ error });
@@ -27,7 +27,7 @@ export class AuthController {
       .catch(error => this.handlerError(error, res));
   };
 
-  loginUser = async (req: Request, res: Response) => {
+  public loginUser = async (req: Request, res: Response) => {
     const [error, loginUserDto] = LoginUserDto.login(req.body);
 
     if (error) return res.status(400).json({ error });
@@ -38,7 +38,12 @@ export class AuthController {
       .catch(error => this.handlerError(error, res));
   };
 
-  validateEmail = async (req: Request, res: Response): Promise<void> => {
-    res.json('validateEmail');
+  public validateEmail = (req: Request, res: Response) => {
+    const { token } = req.params;
+
+    this.authService
+      .validateEmail(token as string)
+      .then(() => res.json('Email validated successfully!!!'))
+      .catch(error => this.handlerError(error, res));
   };
 }
