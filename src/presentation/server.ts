@@ -1,5 +1,5 @@
-import express, { Router } from 'express';
 import path from 'node:path';
+import express, { Router } from 'express';
 
 interface Options {
   port: number;
