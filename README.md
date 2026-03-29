@@ -237,7 +237,14 @@ express-shell/
    docker compose up -d
    ```
 
-5. **Ejecutar en modo desarrollo**
+5. **Llenar la BD con el seed con datos (NO EJECUTAR EN PROD!!!!!)**
+
+   ```bash
+   npm run seed
+
+   ```
+
+6. **Ejecutar en modo desarrollo**
 
    ```bash
    npm run dev
